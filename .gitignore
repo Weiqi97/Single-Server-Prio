@@ -1,3 +1,7 @@
+# --------------- IDE related ---------------
+.idea
+
+# --------------- Go related ---------------
 # Binaries for programs and plugins
 *.exe
 *.exe~
