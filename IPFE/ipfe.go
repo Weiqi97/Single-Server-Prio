@@ -39,6 +39,7 @@ func (scheme IPFE) Dec(c data.Vector, y data.Vector, yKey *big.Int) (xy *big.Int
 }
 
 func (scheme IPFE) AddCiphertext(c1 data.Vector, c2 data.Vector) (c data.Vector) {
+	c = make([]*big.Int, len(c1))
 	for i := range c1 {
 		c[i] = new(big.Int).Mod(new(big.Int).Mul(c1[i], c2[i]), scheme.instance.Params.P)
 	}
@@ -46,8 +47,10 @@ func (scheme IPFE) AddCiphertext(c1 data.Vector, c2 data.Vector) (c data.Vector)
 }
 
 func (scheme IPFE) RecoverCiphertext(msk data.Vector, c data.Vector) (x []*big.Int) {
-	for i := range c {
-		y := utilities.GetStandardBasis(len(c), i)
+	x = make([]*big.Int, len(c)-1)
+
+	for i := 0; i < len(c)-1; i++ {
+		y := utilities.GetStandardBasis(len(c)-1, i)
 		yKey := scheme.KeyDer(msk, y)
 		x[i] = scheme.Dec(c, y, yKey)
 	}
