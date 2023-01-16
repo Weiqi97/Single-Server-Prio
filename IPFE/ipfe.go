@@ -1,6 +1,7 @@
 package IPFE
 
 import (
+	"fmt"
 	"github.com/Weiqi97/Single-Server-Prio/utilities"
 	"github.com/fentec-project/gofe/data"
 	"github.com/fentec-project/gofe/innerprod/simple"
@@ -38,12 +39,23 @@ func (scheme IPFE) Dec(c data.Vector, y data.Vector, yKey *big.Int) (xy *big.Int
 	return
 }
 
-func (scheme IPFE) AddCiphertext(c1 data.Vector, c2 data.Vector) (c data.Vector) {
+func (scheme IPFE) AddTwoCiphertexts(c1 data.Vector, c2 data.Vector) (c data.Vector) {
 	c = make([]*big.Int, len(c1))
 	for i := range c1 {
 		c[i] = new(big.Int).Mod(new(big.Int).Mul(c1[i], c2[i]), scheme.instance.Params.P)
 	}
 	return
+}
+
+func (scheme IPFE) AddCiphertexts(ciphertexts []data.Vector) (c data.Vector, e error) {
+	if len(ciphertexts) < 2 {
+		return nil, fmt.Errorf("not enough arguments to call this function")
+	}
+	c = scheme.AddTwoCiphertexts(ciphertexts[0], ciphertexts[1])
+	for i := 2; i < len(ciphertexts); i++ {
+		c = scheme.AddTwoCiphertexts(c, ciphertexts[i])
+	}
+	return c, nil
 }
 
 func (scheme IPFE) RecoverCiphertext(msk data.Vector, c data.Vector) (x []*big.Int) {

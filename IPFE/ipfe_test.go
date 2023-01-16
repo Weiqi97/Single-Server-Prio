@@ -78,8 +78,8 @@ func TestIPFE_Dec(t *testing.T) {
 	assert.Assert(t, xy.Cmp(big.NewInt(28)) == 0)
 }
 
-// TestIPFE_AddCiphertext is a dummy test that checks whether ciphertext can be added.
-func TestIPFE_AddCiphertext(t *testing.T) {
+// TestIPFE_AddTwoCiphertexts is a dummy test that checks whether two ciphertexts can be added.
+func TestIPFE_AddTwoCiphertexts(t *testing.T) {
 	// Set testing values.
 	xValues := []*big.Int{big.NewInt(1), big.NewInt(2), big.NewInt(3)}
 	x := data.NewVector(xValues)
@@ -92,11 +92,30 @@ func TestIPFE_AddCiphertext(t *testing.T) {
 	c := scheme.Enc(mpk, x)
 
 	// Add x with itself.
-	c = scheme.AddCiphertext(c, c)
+	c = scheme.AddTwoCiphertexts(c, c)
 
 	// Dummy test on length.
 	assert.Assert(t, len(c) == 4)
+}
 
+// TestIPFE_AddCiphertexts is a dummy test that checks whether multiple ciphertexts can be added.
+func TestIPFE_AddCiphertexts(t *testing.T) {
+	// Set testing values.
+	xValues := []*big.Int{big.NewInt(1), big.NewInt(2), big.NewInt(3)}
+	x := data.NewVector(xValues)
+
+	// Initialize the scheme and generate keys.
+	scheme := InitDDHScheme(3, 1024, big.NewInt(10))
+	_, mpk := scheme.KeyGen()
+
+	// Run encryption on x.
+	c := scheme.Enc(mpk, x)
+
+	// Add x with itself.
+	c, _ = scheme.AddCiphertexts([]data.Vector{c, c, c, c})
+
+	// Dummy test on length.
+	assert.Assert(t, len(c) == 4)
 }
 
 // TestIPFE_RecoverCiphertext checks the correctness of adding ciphertext.
@@ -113,7 +132,7 @@ func TestIPFE_RecoverCiphertext(t *testing.T) {
 	c := scheme.Enc(mpk, x)
 
 	// Add x with itself.
-	c = scheme.AddCiphertext(c, c)
+	c, _ = scheme.AddCiphertexts([]data.Vector{c, c, c, c})
 
 	// Recover the added result.
 	xx := scheme.RecoverCiphertext(msk, c)
@@ -122,7 +141,7 @@ func TestIPFE_RecoverCiphertext(t *testing.T) {
 	assert.Assert(t, len(xx) == 3)
 
 	// Check the correctness of the recovered string.
-	assert.Assert(t, xx[0].String() == "2")
-	assert.Assert(t, xx[1].String() == "4")
-	assert.Assert(t, xx[2].String() == "6")
+	assert.Assert(t, xx[0].String() == "4")
+	assert.Assert(t, xx[1].String() == "8")
+	assert.Assert(t, xx[2].String() == "12")
 }
