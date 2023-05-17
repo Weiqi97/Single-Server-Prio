@@ -19,6 +19,11 @@ func InitDDHScheme(vectorLength int, modulusLength int, bound *big.Int) (scheme 
 	return
 }
 
+// GetParam return the IPFE parameters.
+func (scheme IPFE) GetParam() *simple.DDHParams {
+	return scheme.instance.Params
+}
+
 // KeyGen generates the master secret and public keys.
 func (scheme IPFE) KeyGen() (msk data.Vector, mpk data.Vector) {
 	msk, mpk, _ = scheme.instance.GenerateMasterKeys()

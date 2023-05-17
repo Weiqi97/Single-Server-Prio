@@ -17,3 +17,11 @@ func GetStandardBasis(length int, index int) (e []*big.Int) {
 
 	return
 }
+
+func SumVector(length int, x []*big.Int) (sum *big.Int) {
+	sum = x[0]
+	for i := 1; i < length; i++ {
+		sum.Add(sum, x[i])
+	}
+	return
+}
