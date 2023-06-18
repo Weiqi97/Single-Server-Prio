@@ -55,3 +55,7 @@ func (scheme FLPCP) prover(x data.Vector) (pi data.Vector) {
 
 	return
 }
+
+func (scheme FLPCP) verifier() {
+
+}
