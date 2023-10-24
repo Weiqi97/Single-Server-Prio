@@ -1,6 +1,7 @@
-package IPFE
+package test
 
 import (
+	"github.com/Weiqi97/Single-Server-Prio/ipfe"
 	"github.com/fentec-project/gofe/data"
 	"gotest.tools/v3/assert"
 	"math/big"
@@ -10,12 +11,12 @@ import (
 
 // TestInitDDHScheme is a dummy test to make sure the function runs.
 func TestInitDDHScheme(t *testing.T) {
-	_ = InitDDHScheme(3, 1024, big.NewInt(10))
+	_ = ipfe.InitDDHScheme(3, 1024, big.NewInt(10))
 }
 
 // TestIPFE_KeyGen is a dummy test to make sure the function runs.
 func TestIPFE_KeyGen(t *testing.T) {
-	scheme := InitDDHScheme(3, 1024, big.NewInt(10))
+	scheme := ipfe.InitDDHScheme(3, 1024, big.NewInt(10))
 	_, _ = scheme.KeyGen()
 }
 
@@ -26,7 +27,7 @@ func TestIPFE_KeyDer(t *testing.T) {
 	y := data.NewVector(yValues)
 
 	// Initialize the scheme and generate keys.
-	scheme := InitDDHScheme(3, 1024, big.NewInt(10))
+	scheme := ipfe.InitDDHScheme(3, 1024, big.NewInt(10))
 	msk, _ := scheme.KeyGen()
 
 	// Run key derivation on y.
@@ -43,7 +44,7 @@ func TestIPFE_Enc(t *testing.T) {
 	x := data.NewVector(xValues)
 
 	// Initialize the scheme and generate keys.
-	scheme := InitDDHScheme(3, 1024, big.NewInt(10))
+	scheme := ipfe.InitDDHScheme(3, 1024, big.NewInt(10))
 	_, mpk := scheme.KeyGen()
 
 	// Run encryption on x.
@@ -62,7 +63,7 @@ func TestIPFE_Dec(t *testing.T) {
 	x := data.NewVector(xValues)
 
 	// Initialize the scheme and generate keys.
-	scheme := InitDDHScheme(3, 1024, big.NewInt(10))
+	scheme := ipfe.InitDDHScheme(3, 1024, big.NewInt(10))
 	msk, mpk := scheme.KeyGen()
 
 	// Run key derivation on y.
@@ -85,7 +86,7 @@ func TestIPFE_AddTwoCiphertexts(t *testing.T) {
 	x := data.NewVector(xValues)
 
 	// Initialize the scheme and generate keys.
-	scheme := InitDDHScheme(3, 1024, big.NewInt(10))
+	scheme := ipfe.InitDDHScheme(3, 1024, big.NewInt(10))
 	_, mpk := scheme.KeyGen()
 
 	// Run encryption on x.
@@ -105,7 +106,7 @@ func TestIPFE_AddCiphertexts(t *testing.T) {
 	x := data.NewVector(xValues)
 
 	// Initialize the scheme and generate keys.
-	scheme := InitDDHScheme(3, 1024, big.NewInt(10))
+	scheme := ipfe.InitDDHScheme(3, 1024, big.NewInt(10))
 	_, mpk := scheme.KeyGen()
 
 	// Run encryption on x.
@@ -125,7 +126,7 @@ func TestIPFE_RecoverCiphertext(t *testing.T) {
 	x := data.NewVector(xValues)
 
 	// Initialize the scheme and generate keys.
-	scheme := InitDDHScheme(3, 1024, big.NewInt(10))
+	scheme := ipfe.InitDDHScheme(3, 1024, big.NewInt(10))
 	msk, mpk := scheme.KeyGen()
 
 	// Run encryption on x.

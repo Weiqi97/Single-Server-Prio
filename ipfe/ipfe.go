@@ -1,4 +1,4 @@
-package IPFE
+package ipfe
 
 import (
 	"fmt"

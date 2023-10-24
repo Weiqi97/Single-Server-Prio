@@ -1,9 +1,6 @@
 package utilities
 
 import (
-	"fmt"
-	"gonum.org/v1/gonum/mat"
-	"math"
 	"math/big"
 )
 
@@ -23,47 +20,72 @@ func GetStandardBasis(length int, index int) (e []*big.Int) {
 	return
 }
 
-// SumVector sums all elements in a vector.
-func SumVector(length int, x []*big.Int) (sum *big.Int) {
-	sum = x[0]
-	for i := 1; i < length; i++ {
-		sum.Add(sum, x[i])
+// IntPow raises an integer a to power b and return the result in int64 type.
+func IntPow(a, b int) int64 {
+	if b == 0 {
+		return 1
 	}
-	return
+	result := a
+	for i := 2; i <= b; i++ {
+		result *= a
+	}
+	return int64(result)
 }
 
-// LinSolver finds the solution of Ax = b to x.
-func LinSolver(numGate int, y []float64) (x []float64) {
-	matrixA := mat.NewDense(numGate, numGate+1, nil)
+// LinSolver Given a square matrix A and result b, finds the solution of Ax = b to x.
+func LinSolver(b []Zp) (x []Zp) {
+	// Get the modulo.
+	mod := b[0].GetMod()
 
-	// Fill in the matrix.
-	for i := 0; i < numGate; i++ {
-		for j := 0; j < numGate; j++ {
-			matrixA.Set(i, j, math.Pow(float64(i), float64(j)))
+	// We know that A is a square matrix whose side length is same as b.
+	size := len(b) // Size here in most cases is the same as number of G gate.
+
+	// Create the composed matrix Ab.
+	matrix := make([][]Zp, size)
+
+	// Fill in the matrix, suppose the degree goes from high to low.
+	for i := 0; i < size; i++ {
+		matrix[i] = make([]Zp, size+1)
+		for j := 0; j < size; j++ {
+			temp := IntPow(i+1, size-j)
+			matrix[i][j] = NewZp(big.NewInt(temp), mod)
+		}
+		matrix[i][size] = b[i]
+	}
+
+	// Bottom left half to all zeros.
+	for i := 0; i < size; i++ {
+		for j := i; j < size; j++ {
+			if i == j && matrix[i][j].GetEle().Cmp(big.NewInt(1)) != 0 {
+				multiplier := Inv(matrix[i][i])
+				for k := i; k <= size; k++ {
+					matrix[j][k] = Mul(matrix[j][k], multiplier)
+				}
+			}
+
+			if i != j {
+				multiplier := matrix[j][i]
+				for k := i; k <= size; k++ {
+					matrix[j][k] = Sub(matrix[j][k], Mul(matrix[i][k], multiplier))
+				}
+			}
 		}
 	}
 
-	// Add 1 for the constant.
-	for i := 0; i < numGate; i++ {
-		matrixA.Set(i, numGate, 1.0)
+	// Top right half to all zeros.
+	for i := size - 1; i > 0; i-- {
+		for j := i - 1; j >= 0; j-- {
+			multiplier := matrix[j][i]
+			for k := i; k <= size; k++ {
+				matrix[j][k] = Sub(matrix[j][k], Mul(matrix[i][k], multiplier))
+			}
+		}
 	}
 
-	// Convert y values to vec.
-	yVec := mat.NewVecDense(numGate, y)
-
-	// Create the coefficients.
-	coeffs := mat.NewVecDense(numGate+1, nil)
-
-	// Solve the linear system.
-	err := coeffs.SolveVec(matrixA, yVec)
-
-	// Error handling.
-	if err != nil {
-		fmt.Println("Error:", err)
-		return
+	// Get the intended result.
+	for i := 0; i < size; i++ {
+		x = append(x, matrix[i][size])
 	}
 
-	// Assign values and return.
-	x = coeffs.RawVector().Data
 	return
 }

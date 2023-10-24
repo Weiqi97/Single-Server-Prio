@@ -12,7 +12,7 @@ COPY go.sum ./
 RUN go mod download
 
 # Copy over the necessary folders and files.
-COPY FLPCP/ ./FLPCP/
-COPY IPFE/ ./IPFE/
+COPY flpcp/ ./FLPCP/
+COPY ipfe/ ./IPFE/
 COPY utilities/ ./utilities/
 COPY *.go ./
